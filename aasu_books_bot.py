@@ -261,11 +261,13 @@ _build_button_maps()
 
 MAIN_REQUEST_BUTTON = "طلب كتاب غير موجود ✉️"
 MAIN_BACK_BUTTON = "القائمة الرئيسية ⬅️ BACK"
+CONTACT_BUTTON = "📬 تواصل معنا"
 
 
 def build_main_menu() -> ReplyKeyboardMarkup:
     rows = [[KeyboardButton(text)] for text in SECTION_BUTTONS.keys()]
     rows.append([KeyboardButton(MAIN_REQUEST_BUTTON)])
+    rows.append([KeyboardButton(CONTACT_BUTTON)])
     return ReplyKeyboardMarkup(rows, resize_keyboard=True)
 
 
@@ -278,8 +280,8 @@ async def send_welcome(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "1️⃣ اختر القسم من الأزرار بالأسفل.\n"
         "2️⃣ اختر اسم الكتاب الذي تريده.\n"
         "3️⃣ سيصلك الكتاب مباشرة كملف PDF.\n\n"
-        "إذا لم تجد كتابك، اضغط الزر:\n"
-        f"«{MAIN_REQUEST_BUTTON}» لطلب إضافة كتاب جديد.\n"
+        f"إذا لم تجد كتابك، اضغط «{MAIN_REQUEST_BUTTON}».\n"
+        f"وللتواصل معنا اضغط «{CONTACT_BUTTON}».\n"
     )
     await context.bot.send_message(
         chat_id=chat_id,
@@ -295,39 +297,64 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     text = (update.message.text or "").strip()
 
+    # رجوع للقائمة الرئيسية
     if text == MAIN_BACK_BUTTON or text.lower() in {"/menu", "main menu"}:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text="اختر القسم:",
+            text="تم الرجوع للقائمة الرئيسية.\nاختر القسم من الأزرار بالأسفل.",
             reply_markup=build_main_menu(),
         )
         return
 
+    # زر طلب كتاب غير موجود
     if text == MAIN_REQUEST_BUTTON:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=(
-                "إذا لم تجد كتابك في القوائم، أرسل اسم المقرر واسم الكتاب والطبعة "
+                "إذا لم تجد كتابك في القوائم، اكتب اسم المقرر واسم الكتاب والطبعة "
                 "أو تواصل معنا على إنستغرام:\n"
                 "@BOOKADVISORS\n\n"
                 "سنحاول إضافته في أقرب وقت."
             ),
+            reply_markup=build_main_menu(),
         )
         return
 
+    # زر تواصل معنا
+    if text == CONTACT_BUTTON:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=(
+                "📬 للتواصل معنا:\n"
+                "• إنستغرام: @BOOKADVISORS\n"
+                "يمكنك أيضًا كتابة استفسارك هنا وسنراجعه لاحقًا.\n"
+            ),
+            reply_markup=build_main_menu(),
+        )
+        return
+
+    # اختيار قسم
     if text in SECTION_BUTTONS:
         sec_key = SECTION_BUTTONS[text]
         await send_section_books(sec_key, update, context)
         return
 
+    # اختيار كتاب
     if text in BOOK_BUTTONS:
         sec_key, book_key = BOOK_BUTTONS[text]
         await send_book_files(sec_key, book_key, update, context)
         return
 
+    # أي نص غير معروف
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="استخدم الأزرار بالأسفل لاختيار القسم أو الكتاب.",
+        text=(
+            "لم أفهم رسالتك.\n\n"
+            "إذا كنت تبحث عن كتاب، اضغط على أحد الأزرار في الأسفل لاختيار القسم.\n"
+            f"للعودة للقائمة الرئيسية اكتب /start أو اضغط «{MAIN_BACK_BUTTON}».\n"
+            f"وللتواصل معنا اضغط «{CONTACT_BUTTON}»."
+        ),
+        reply_markup=build_main_menu(),
     )
 
 
@@ -343,6 +370,7 @@ async def send_section_books(
     ]
     rows.append([KeyboardButton(MAIN_BACK_BUTTON)])
     rows.append([KeyboardButton(MAIN_REQUEST_BUTTON)])
+    rows.append([KeyboardButton(CONTACT_BUTTON)])
 
     reply_markup = ReplyKeyboardMarkup(rows, resize_keyboard=True)
 
@@ -367,6 +395,7 @@ async def send_book_files(
                 f"الكتاب «{book['title']}» غير مضاف حاليًّا أو أن الملف يحتاج تحديثًا.\n"
                 "سيتم رفعه قريبًا إن شاء الله."
             ),
+            reply_markup=build_main_menu(),
         )
         return
 
@@ -392,6 +421,7 @@ async def send_book_files(
                 "إذا تكرر الخطأ، راسلنا على إنستغرام:\n"
                 "@BOOKADVISORS"
             ),
+            reply_markup=build_main_menu(),
         )
 
 
