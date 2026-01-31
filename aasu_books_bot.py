@@ -40,14 +40,13 @@ BOOKS: Dict[str, Dict[str, Any]] = {
                     "BQACAgQAAxkBAAIL3Wl-EzoDyNzQ5XjTE_FRGbrVuotoAAIeGwAC8nHxU3nuGyUha9KHOAQ",
                 ],
             },
-"IEP099": {
-    "title": "IEP099",
-    "files": [
-        "BQACAgQAAxkBAAIMEWl-FNLQ7CV-qOpJ6NL-r412lwmHAAIhGwAC8nHxU4rMrWQVI3_Uoaq",
-        "BQACAgQAAxkBAAIMFWl-FNw65ZKvj2cUhl4nVWQn80d9AAIiGwAC8nHxU_XTBdumCrE1OAQ",
-    ],
-},
-
+            "IEP099": {
+                "title": "IEP099",
+                # ضع هنا file_id الصحيح لملفات IEP099 عندما تحصل عليهما
+                # مثال:
+                # "files": ["id_1", "id_2"],
+                "files": [],
+            },
             "ENL101": {
                 "title": "ENL101",
                 "files": [
@@ -317,7 +316,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             chat_id=update.effective_chat.id,
             text=(
                 "إذا لم تجد كتابك في القوائم، أرسل لنا اسم المقرر، اسم الكتاب، "
-                "والطبعة على تليقرام:\n"
+                "والطبعة على تيليقرام:\n"
                 "@BOOKADVISORS\n\n"
                 "أو اكتبها هنا كرسالة وسنحاول إضافته في أقرب وقت."
             ),
@@ -419,6 +418,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-
-
