@@ -34,7 +34,7 @@ ADMIN_ID = 946972632  # اليوزر آي دي الخاص بك
 
 
 # =========================
-# بيانات الكتب (كل الأقسام)
+# بيانات الكتب (كل الأقسام) بالـ file_id الجديدة
 # =========================
 
 BOOKS: Dict[str, Dict[str, Any]] = {
@@ -44,29 +44,29 @@ BOOKS: Dict[str, Dict[str, Any]] = {
         "items": {
             "IEP098": {
                 "files": [
-                    "BQACAgQAAxkBAAIL3Gl-EzrZzs2g07czYxViZnFQUmuMAAIdGwAC8nHxUxzXjXFnArCtOAQ",
-                    "BQACAgQAAxkBAAIL3Wl-EzoDyNzQ5XjTE_FRGbrVuotoAAIeGwAC8nHxU3nuGyUha9KHOAQ",
+                    "BQACAgQAAxkBAAMtaX5vLh2iuAElC-X22jGB98M4jZ8AAh0bAALycfFT5P2OaRVqwU84BA",
+                    "BQACAgQAAxkBAAMvaX5vM_EQ6RxDldR1UepLJJ4ThlcAAh4bAALycfFTYVhoJo16sB44BA",
                 ]
             },
             "IEP099": {
                 "files": [
-                    "BQACAgQAAxkBAANiaX5DlJuH3ba_Ayl9T2Tf3gOfqdMAAiEbAALycfFTpy3dulVQaRw4BA",
-                    "BQACAgQAAxkBAANkaX5DnKijQjw-ZL2xUrQEgwV6kCAAAiIbAALycfFTg7sY1hTGlJ44BA",
+                    "BQACAgQAAxkBAAMxaX5vOj988pEn5TzlDgzvrJDia1QAAiEbAALycfFT2W31fcmOoow4BA",
+                    "BQACAgQAAxkBAAMzaX5vP7hvzNPZl_xdB2XVjWsuyO0AAiIbAALycfFTQXNw8qVhWCI4BA",
                 ]
             },
             "ENL101": {
                 "files": [
-                    "BQACAgQAAxkBAAIMGWl-FOUnbh4wOGsNbtLngKoYyPtuAAIjGwAC8nHxU0Y7oQvq1Z2NOAQ"
+                    "BQACAgQAAxkBAAM1aX5vRkeJ41v7AAEWIuToJThE9IrFAAIjGwAC8nHxU2bQqlVZtJfvOAQ"
                 ]
             },
             "ENL102": {
                 "files": [
-                    "BQACAgQAAxkBAAIMHWl-FQXlddgKlr3P5iYirVVA9rNrAAIkGwAC8nHxU2BsDB5e1iDjOAQ"
+                    "BQACAgQAAxkBAAM3aX5vUK4JTepwI09EGtcE292tb9wAAiQbAALycfFTECxkQ79jFU04BA"
                 ]
             },
             "ENL201": {
                 "files": [
-                    "BQACAgQAAxkBAAIMIWl-FQ_weESJKCt12xhL4jhS_qGWAAIlGwAC8nHxU1b2DjPqD5tVOAQ"
+                    "BQACAgQAAxkBAAM5aX5vUx92hdn6zXjhkqAZFbChK9oAAiUbAALycfFTGuJAaEpW-M04BA"
                 ]
             },
         },
@@ -78,39 +78,39 @@ BOOKS: Dict[str, Dict[str, Any]] = {
         "items": {
             "IMP098": {
                 "files": [
-                    "BQACAgQAAxkBAAILz2l-ECGbiXh0jlcNWQAB4rH6wVDivgACERsAAvJx8VOGbCjs9abLrjgE"
+                    "BQACAgQAAxkBAAMbaX5u6LHTcAsUMAIXVkRLUBLqYq8AAhEbAALycfFT4uWe0Pm7Wu04BA"
                 ]
             },
             "IMP099": {
                 "files": [
-                    "BQACAgQAAxkBAAIL0Gl-ECHaJnh4p1bVl_2xEYmrvF5zAAITGwAC8nHxUws9ZXV3xq5fOAQ"
+                    "BQACAgQAAxkBAAMdaX5u-lkVZz9-1TieLF7huHmeAAGjAAITGwAC8nHxU7NFF816Q8QsOAQ"
                 ]
             },
             "MAT120": {
                 "files": [
-                    "BQACAgQAAxkBAAIL0Wl-ECGAbAkm5fcbYxKLUQWTmAABBwACFBsAAvJx8VO5FMY6jCWnFzgE"
+                    "BQACAgQAAxkBAAMfaX5u_iBEJk23DIk0EEzI6YlzYy4AAhQbAALycfFTZLidRhDFcNs4BA"
                 ]
             },
             "MAT202": {
                 "files": [
-                    "BQACAgQAAxkBAAIL0ml-ECF-irXDHPkbWBXHC8KIb-WnAAIWGwAC8nHxU58M0c9N4NY1OAQ",
-                    "BQACAgQAAxkBAAIL02l-ECEG1xtclFYQE9nfddmOy-iTAAIXGwAC8nHxU5KDFOw2KgrAOAQ",
+                    "BQACAgQAAxkBAAMhaX5vBZ-ET_Q7o9nd9-faLRNPBEUAAhYbAALycfFTuI5CJPA_jEw4BA",
+                    "BQACAgQAAxkBAAMjaX5vDWbzyzJcC5xYv8FXiL2vhywAAhcbAALycfFTFHbX1IBzlMI4BA",
                 ]
             },
             "MAT240": {
                 "files": [
-                    "BQACAgQAAxkBAAIL1Gl-ECGkSQWzVoimStRO2izZYIsaAAIYGwAC8nHxU1w3q6vTihc5OAQ"
+                    "BQACAgQAAxkBAAMlaX5vFBFA0ake--vnTaVzJnp9VuYAAhgbAALycfFToTmwpGqKj5k4BA"
                 ]
             },
             "CALCULUS 1+2+3, 14th edition": {
                 "files": [
-                    "BQACAgQAAxkBAAIL1Wl-ECGdFc_Jd6jbsEF47J-lJ950AAIZGwAC8nHxU5s8Au3aPqiYOAQ",
-                    "BQACAgQAAxkBAAIL1ml-ECHDd_INapp0zO-nyGOJxgltAAIbGwAC8nHxU6ngDlvpZT7LOAQ",
+                    "BQACAgQAAxkBAAMnaX5vHECBsVrJ-uHHVyzMc-yrWiEAAhkbAALycfFT7UITGbt4LLQ4BA",
+                    "BQACAgQAAxkBAAMpaX5vIoy91eRXWDC8bYvGSNMdAzwAAhsbAALycfFTxc1zW-wDk5I4BA",
                 ]
             },
             "CALCULUS 1+2+3, 15th edition": {
                 "files": [
-                    "BQACAgQAAxkBAAIL12l-ECGz_nLCgUr0F48_s5H3D0h0AAIcGwAC8nHxU5DyCjnsOA1-OAQ"
+                    "BQACAgQAAxkBAAMraX5vKDQd7n7l20KsKnHf3IcMuUwAAhwbAALycfFTFMxbX1rb5v44BA"
                 ]
             },
         },
@@ -122,18 +122,18 @@ BOOKS: Dict[str, Dict[str, Any]] = {
         "items": {
             "CHEMISTRY": {
                 "files": [
-                    "BQACAgQAAxkBAAIMKWl-FSTI_dUM8mdsOuzXqvtE6mjVAAInGwAC8nHxU3X8S6YnxBvtOAQ"
+                    "BQACAgQAAxkBAAM9aX5vXw6jqLT2_27mI2g8uVX83mEAAicbAALycfFTdeszOqRQtRc4BA"
                 ]
             },
             "BIOLOGY": {
                 "files": [
-                    "BQACAgQAAxkBAAIMJWl-FRvYNe_GWcR8xfQdSERQlH8jAAImGwAC8nHxU7fqnRfcBL-JOAQ"
+                    "BQACAgQAAxkBAAM7aX5vV1Uo8AXYlmY8Y1MGFVZl4s8AAiYbAALycfFTLQ1hBZ3XuD04BA"
                 ]
             },
             "PHYSICS 1+2": {
                 "files": [
-                    "BQACAgQAAxkBAAIMLWl-FS4D6E8WOw4ye7VsWm-qwt6xAAIoGwAC8nHxU5UX0CLUbH48OAQ",
-                    "BQACAgQAAxkBAAIMMWl-FUB--sIR3Kbp21uT4JkvZsKIAAIpGwAC8nHxU-ExZbt3dQsfOAQ",
+                    "BQACAgQAAxkBAAM_aX5vZ5ACLX5TvMb6p2KvoJm-Mf8AAigbAALycfFTolMDH2dhD_84BA",
+                    "BQACAgQAAxkBAANBaX5vbuKlAk8l3njOGB9pfB99SZoAAikbAALycfFT8Q_neukjlvc4BA",
                 ]
             },
         },
@@ -145,33 +145,33 @@ BOOKS: Dict[str, Dict[str, Any]] = {
         "items": {
             "Sustainable Energy": {
                 "files": [
-                    "BQACAgQAAxkBAAIMNml-FVAYIXNs2KPC9RyyeIYurThDAAIqGwAC8nHxU5AOCer6Uom2OAQ"
+                    "BQACAgQAAxkBAANDaX5vdKZMmaYPuhltN_TIe_xco8kAAiobAALycfFTAx7sWTv9SO44BA"
                 ]
             },
             "Numerical Methods": {
                 "files": [
-                    "BQACAgQAAxkBAAIMOml-FXN2tvwsnyz2Kki8Lz_4aZzmAAIrGwAC8nHxU-2B7iedfCcLOAQ"
+                    "BQACAgQAAxkBAANFaX5vdwY8DCgmhLoWoPZd25L1HUAAAisbAALycfFT-UITF_higVQ4BA"
                 ]
             },
             "Statistics and Probability": {
                 "files": [
-                    "BQACAgQAAxkBAAIMPml-FYWsXRClTnrowVJWTd6T1rGmAAIsGwAC8nHxU0RW_VA4ghQtOAQ"
+                    "BQACAgQAAxkBAANHaX5vfZHA-5BlwaYzhlbC8Unx43MAAiwbAALycfFTxRbbjbUx65E4BA"
                 ]
             },
             "STATICS AND ENGINEERING": {
                 "files": [
-                    "BQACAgQAAxkBAAIMQml-FZjPOxYp9ZmOOyCeaNZjQ6B0AAItGwAC8nHxUw2FATSwcdEyOAQ"
+                    "BQACAgQAAxkBAANJaX5vgsXRFe6lGkmx-u65xH-ytLEAAi0bAALycfFTVwMCgJk9umo4BA"
                 ]
             },
             "Power Electronics": {
                 "files": [
-                    "BQACAgQAAxkBAAIMRml-FaVOtMx3sENUGqGq5yVXAu9xAAIuGwAC8nHxU00l9Cv3g8z-OAQ"
+                    "BQACAgQAAxkBAANLaX5vhwmamnjb3KYBKhEBtPfWzpwAAi4bAALycfFTXMmRtuDK_XM4BA"
                 ]
             },
             "Thermodynamics": {
                 "files": [
-                    "BQACAgQAAxkBAAIMSml-FbLrrmYkgzQnziGSNi9W_dgrAAIvGwAC8nHxUwpE1g0nEDKWOAQ",
-                    "BQACAgQAAxkBAAIMTml-FbkUe9Fjhce70kH6fhTOV0RDAAIwGwAC8nHxU1BgiE_TMfeBOAQ",
+                    "BQACAgQAAxkBAANNaX5vjp4lfg3vBTz5lqgOHrXiE3EAAi8bAALycfFTJidjTWKvx8U4BA",
+                    "BQACAgQAAxkBAANPaX5vlnBfqLT1-21sEuBwZ6kqfoYAAjAbAALycfFT2jd3xW8rRh44BA",
                 ]
             },
         },
@@ -183,17 +183,17 @@ BOOKS: Dict[str, Dict[str, Any]] = {
         "items": {
             "Digital Logic": {
                 "files": [
-                    "BQACAgQAAxkBAAIMUml-FcOEj8C3sprkk8wr4HUwy7dLAAIxGwAC8nHxU8K0a9dzrH-mOAQ"
+                    "BQACAgQAAxkBAANRaX5vmhUAAek-JvkWDQTimHLRvfM8AAIxGwAC8nHxU-ZSNlrZ2HqrOAQ"
                 ]
             },
             "JAVA": {
                 "files": [
-                    "BQACAgQAAxkBAAIMWml-FeEMdZcvxOrd_PyfhFaxmBu5AAIzGwAC8nHxU-kZyqo6BeDNOAQ"
+                    "BQACAgQAAxkBAANVaX5voNXM9mpJO1kZBAjEPIxnRQEAAjMbAALycfFT9wG2BLTjPBw4BA"
                 ]
             },
             "C++": {
                 "files": [
-                    "BQACAgQAAxkBAAIMVml-FdX5yUdk6QK3xlmgmYXrlL94AAIyGwAC8nHxUxgG1qHRu715OAQ"
+                    "BQACAgQAAxkBAANTaX5vnQiqvofg5LuQIAaiOtUPZ_UAAjIbAALycfFT-lhCayDIsTw4BA"
                 ]
             },
         },
@@ -205,7 +205,7 @@ BOOKS: Dict[str, Dict[str, Any]] = {
         "items": {
             "International Economics": {
                 "files": [
-                    "BQACAgQAAxkBAAIMXml-FevL7ZdBcXOeIIy8zQlYZGozAAI0GwAC8nHxU7X3vLUkvyKcOAQ"
+                    "BQACAgQAAxkBAANXaX5vo19zY_BJSxWz33f6Ay5DuXEAAjQbAALycfFTzBSWuQOD7o44BA"
                 ]
             },
         },
@@ -217,12 +217,12 @@ BOOKS: Dict[str, Dict[str, Any]] = {
         "items": {
             "INF": {
                 "files": [
-                    "BQACAgQAAxkBAAIMYml-FfV_XIgV2ywjRO5J12Vb6NuQAAI1GwAC8nHxU8QtFQABNpq81jgE"
+                    "BQACAgQAAxkBAANZaX5vpXYQcowX2CjATbgexP7N7dAAAjUbAALycfFT7CkQzdYYr8E4BA"
                 ]
             },
             "ETHICS": {
                 "files": [
-                    "BQACAgQAAxkBAAIMZml-Ff7ymjnq3qdBttRPIvXqLXfoAAI2GwAC8nHxU3d75xq1hwvuOAQ"
+                    "BQACAgQAAxkBAANbaX5vqoHIY6TFG5_xxVxbRWtlpogAAjYbAALycfFT02sE7fCCZTM4BA"
                 ]
             },
         },
