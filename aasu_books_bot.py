@@ -326,7 +326,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             chat_id=update.effective_chat.id,
             text=(
                 "📬 للتواصل معنا:\n"
-                "• إنستغرام: @BOOKADVISORS\n"
+                "• اضغط على اليوزر: @BOOKADVISORS\n"
                 "يمكنك أيضًا كتابة استفسارك هنا وسنراجعه لاحقًا.\n"
             ),
             reply_markup=build_main_menu(),
@@ -435,3 +435,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
