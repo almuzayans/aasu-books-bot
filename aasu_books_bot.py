@@ -291,7 +291,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             "• اسم المقرر\n"
             "• اسم الكتاب\n"
             "• رقم الطبعة (Edition) إن وجد\n\n"
-            "أو راسلنا على إنستغرام:\n"
+            "أو راسلنا على تليقرام:\n"
             "@BOOKADVISORS",
             reply_markup=main_menu(),
         )
@@ -334,7 +334,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
                 logger.error("Error sending %s: %s", book_title, e)
                 await update.message.reply_text(
                     "حدث خطأ أثناء إرسال الملف.\n"
-                    "إذا تكرر الخطأ، راسلنا على إنستغرام:\n"
+                    "إذا تكرر الخطأ، راسلنا على تليقرام:\n"
                     "@BOOKADVISORS",
                     reply_markup=section_menu(sec_key),
                 )
@@ -365,3 +365,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
