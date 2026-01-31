@@ -42,10 +42,10 @@ BOOKS: Dict[str, Dict[str, Any]] = {
             },
             "IEP099": {
                 "title": "IEP099",
-                # ضع هنا file_id الصحيح لملفات IEP099 عندما تحصل عليهما
-                # مثال:
-                # "files": ["id_1", "id_2"],
-                "files": [],
+                "files": [
+                    "BQACAgQAAxkBAANiaX5DlJuH3ba_Ayl9T2Tf3gOfqdMAAiEbAALycfFTpy3dulVQaRw4BA",
+                    "BQACAgQAAxkBAANkaX5DnKijQjw-ZL2xUrQEgwV6kCAAAiIbAALycfFTg7sY1hTGlJ44BA",
+                ],
             },
             "ENL101": {
                 "title": "ENL101",
@@ -241,16 +241,13 @@ BOOKS: Dict[str, Dict[str, Any]] = {
     },
 }
 
-# سيتم ملؤها آليًا بعد تعريف BOOKS
 SECTION_BUTTONS: Dict[str, str] = {}
 BOOK_BUTTONS: Dict[str, tuple] = {}
 
 
 def _build_button_maps() -> None:
-    """تحضير القوائم من BOOKS."""
     SECTION_BUTTONS.clear()
     BOOK_BUTTONS.clear()
-
     for sec_key, sec_data in BOOKS.items():
         sec_button = f"{sec_data['title']} {sec_data['emoji']}"
         SECTION_BUTTONS[sec_button] = sec_key
@@ -260,7 +257,6 @@ def _build_button_maps() -> None:
             BOOK_BUTTONS[book_button] = (sec_key, book_key)
 
 
-# استدعاء مرة واحدة عند التشغيل
 _build_button_maps()
 
 MAIN_REQUEST_BUTTON = "طلب كتاب غير موجود ✉️"
@@ -275,7 +271,6 @@ def build_main_menu() -> ReplyKeyboardMarkup:
 
 async def send_welcome(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat_id = update.effective_chat.id
-
     text = (
         "مرحبًا بك في بوت الكتب غير الرسمي لجامعة عبدالله السالم AASU Books Bot.\n\n"
         "⚠️ البوت غير تابع رسميًا للجامعة.\n\n"
@@ -286,7 +281,6 @@ async def send_welcome(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "إذا لم تجد كتابك، اضغط الزر:\n"
         f"«{MAIN_REQUEST_BUTTON}» لطلب إضافة كتاب جديد.\n"
     )
-
     await context.bot.send_message(
         chat_id=chat_id,
         text=text,
@@ -301,7 +295,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     text = (update.message.text or "").strip()
 
-    # رجوع للقائمة الرئيسية
     if text == MAIN_BACK_BUTTON or text.lower() in {"/menu", "main menu"}:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -310,32 +303,28 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         )
         return
 
-    # زر طلب كتاب غير موجود
     if text == MAIN_REQUEST_BUTTON:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=(
-                "إذا لم تجد كتابك في القوائم، أرسل لنا اسم المقرر، اسم الكتاب، "
-                "والطبعة على إنستغرام:\n"
+                "إذا لم تجد كتابك في القوائم، أرسل اسم المقرر واسم الكتاب والطبعة "
+                "أو تواصل معنا على إنستغرام:\n"
                 "@BOOKADVISORS\n\n"
-                "أو اكتبها هنا كرسالة وسنحاول إضافته في أقرب وقت."
+                "سنحاول إضافته في أقرب وقت."
             ),
         )
         return
 
-    # اختيار قسم
     if text in SECTION_BUTTONS:
         sec_key = SECTION_BUTTONS[text]
         await send_section_books(sec_key, update, context)
         return
 
-    # اختيار كتاب
     if text in BOOK_BUTTONS:
         sec_key, book_key = BOOK_BUTTONS[text]
         await send_book_files(sec_key, book_key, update, context)
         return
 
-    # نص عشوائي
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="استخدم الأزرار بالأسفل لاختيار القسم أو الكتاب.",
@@ -375,7 +364,7 @@ async def send_book_files(
         await context.bot.send_message(
             chat_id=chat_id,
             text=(
-                f"الكتاب «{book['title']}» غير مضاف حاليًّا أو أن الرابط يحتاج تحديثًا.\n"
+                f"الكتاب «{book['title']}» غير مضاف حاليًّا أو أن الملف يحتاج تحديثًا.\n"
                 "سيتم رفعه قريبًا إن شاء الله."
             ),
         )
@@ -408,10 +397,8 @@ async def send_book_files(
 
 def main() -> None:
     application = ApplicationBuilder().token(BOT_TOKEN).build()
-
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
-
     logger.info("Bot is starting...")
     application.run_polling()
 
