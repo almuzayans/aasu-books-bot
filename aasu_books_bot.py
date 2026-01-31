@@ -291,8 +291,6 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             "• اسم المقرر\n"
             "• اسم الكتاب\n"
             "• رقم الطبعة (Edition) إن وجد\n\n"
-            "أو راسلنا على إنستغرام:\n"
-            "@BOOKADVISORS",
             reply_markup=main_menu(),
         )
         return
@@ -365,3 +363,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
