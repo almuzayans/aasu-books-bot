@@ -316,7 +316,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             chat_id=update.effective_chat.id,
             text=(
                 "إذا لم تجد كتابك في القوائم، أرسل لنا اسم المقرر، اسم الكتاب، "
-                "والطبعة على إنستغرام:\n"
+                "والطبعة على تليقرام:\n"
                 "@BOOKADVISORS\n\n"
                 "أو اكتبها هنا كرسالة وسنحاول إضافته في أقرب وقت."
             ),
@@ -418,3 +418,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
