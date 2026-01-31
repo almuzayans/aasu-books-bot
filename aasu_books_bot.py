@@ -269,7 +269,7 @@ def section_menu(section_key: str) -> ReplyKeyboardMarkup:
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         "مرحبًا بك في UNIVERSITIES BOOKS BOT 📚\n\n"
-        "بوت غير رسمي لمساعدة طلاب الجامعات في الكويت على الوصول للكتب.\n\n"
+        "بوت غير رسمي لمساعدة طلاب الجامعات في الكويت على الوصول للكتب الانجليزية.\n\n"
         "اختر القسم من الأزرار بالأسفل، ثم اختر الكتاب.\n"
         f"إذا لم تجد كتابك اضغط «{REQUEST_BUTTON}».",
         reply_markup=main_menu(),
@@ -399,4 +399,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
 
