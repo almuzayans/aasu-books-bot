@@ -292,7 +292,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             "• اسم الكتاب\n"
             "• رقم الطبعة (Edition) إن وجد\n\n"
             " على قناتنا في تليقرام:\n"
-            "@AASUBOOKREQUEST",
+            "@AASUBOOKSREQUEST",
             reply_markup=main_menu(),
         )
         return
@@ -335,7 +335,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
                 await update.message.reply_text(
                     "حدث خطأ أثناء إرسال الملف.\n"
                     "إذا تكرر الخطأ، راسلنا على قناتنا في تلقرام:\n"
-                    "@AASUBOOKREQUEST",
+                    "@AASUBOOKSREQUEST",
                     reply_markup=section_menu(sec_key),
                 )
                 break
@@ -365,6 +365,7 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
 
 
 
