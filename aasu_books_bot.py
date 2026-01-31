@@ -1,164 +1,254 @@
 import os
+import logging
+from typing import Dict, List
+
 from telegram import (
     Update,
     ReplyKeyboardMarkup,
-    KeyboardButton,
+    ReplyKeyboardRemove,
 )
 from telegram.ext import (
-    ApplicationBuilder,
+    Application,
     CommandHandler,
     MessageHandler,
     ContextTypes,
     filters,
 )
 
-# ============= إعداد الأزرار =============
+# =========================
+# إعداد اللوجينغ
+# =========================
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+)
+logger = logging.getLogger(__name__)
 
-BACK_BUTTON = "🔙 القائمة الرئيسية"
-REQUEST_BOOK_BUTTON = "📩 طلب كتاب غير موجود"
+# =========================
+# متغيّر التوكن من بيئة التشغيل
+# =========================
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
-# CATEGORIES: كل قسم يحتوي كتب + قائمة الـ file_id لكل كتاب
-CATEGORIES = {
-    "ENGLISH 📘": {
-        "IEP098": [
-            "BQACAgQAAxkBAANeaX5DhKElVq3fMBxlGEbgGvcqcjwAAh0bAALycfFT9BoAAUXJL5S4OAQ",
-            "BQACAgQAAxkBAANgaX5DjPtZvQJ1f97skcmc8_GDAXIAAh4bAALycfFT5GMrDI8u7wU4BA",
-        ],
-        "IEP099": [
-            "BQACAgQAAxkBAANiaX5DlJuH3ba_Ayl9T2Tf3gOfqdMAAiEbAALycfFTpy3dulVQaRw4BA",
-            "BQACAgQAAxkBAANkaX5DnKijQjw-ZL2xUrQEgwV6kCAAAiIbAALycfFTg7sY1hTGlJ44BA",
-        ],
-        "ENL101": [
-            "BQACAgQAAxkBAANmaX5DoaPcTqVf2DH4TewM8EMZetMAAiMbAALycfFTk1YxE2Opeyk4BA",
-        ],
-        "ENL102": [
-            "BQACAgQAAxkBAANoaX5DpDgsISuxIOX8huMpAQqckDkAAiQbAALycfFT3tRwYVSpZmg4BA",
-        ],
-        "ENL201": [
-            "BQACAgQAAxkBAANqaX5DpyY3cXce9IqeglPbmybTwMQAAiUbAALycfFTs1G44mXYJSY4BA",
-        ],
-    },
 
-    "MATHEMATICS 📕": {
-        "IMP098": [
-            "BQACAgQAAxkBAANMaX5C3-WU-9eRhjfOt_0TqdfH3X8AAhEbAALycfFTMHq5VYmQzvE4BA",
-        ],
-        "IMP099": [
-            "BQACAgQAAxkBAANOaX5DAu1cHa3-AiuqRBIaV--yhjkAAhMbAALycfFTfNO4uXFsV9o4BA",
-        ],
-        "MAT120": [
-            "BQACAgQAAxkBAANQaX5DCNSSyX0DH1qRpDQnyWC_I4kAAhQbAALycfFTNNcZ2GMWaGw4BA",
-        ],
-        "MAT202": [
-            "BQACAgQAAxkBAANSaX5DELOJ_d0NWzISHplFEPvGlCwAAhYbAALycfFT_q1WURHg0Dk4BA",
-            "BQACAgQAAxkBAANUaX5DJZ8Fr2hbcbUhme5rTywJNQUAAhcbAALycfFTr15SrbMrbJw4BA",
-        ],
-        "MAT240": [
-            "BQACAgQAAxkBAANWaX5DLdLx7S_CtqajctIFvxTKfuMAAhgbAALycfFTnxqt4fRCfj04BA",
-        ],
-        "CALCULUS 1+2+3, 14th edition": [
-            "BQACAgQAAxkBAANYaX5DMoTQJmYXVwb_S9Y1jhhnadwAAhkbAALycfFT47dPGDOwyYg4BA",
-            "BQACAgQAAyEFAATd7DxXAANTaX5DY7ci7lyPxrsSDlyclYPdEmMAAhsbAALycfFTez66ahxP7Vs4BA",
-        ],
-        "CALCULUS 1+2+3, 15th edition": [
-            "BQACAgQAAxkBAANcaX5DfqkAAXmt2grbQfGoGoxPRuJgAAIcGwAC8nHxU-9rxxOsCx3eOAQ",
-        ],
-    },
+# =========================
+# القوائم والأزرار
+# =========================
 
-    "SCIENCE 📙": {
-        "CHEMISTRY": [
-            # تنبيه: هذا FILE_ID مطابق لـ ENL201 كما أرسلته أنت. لو كان خطأ استبدله لاحقاً بالصح.
-            "BQACAgQAAxkBAANqaX5DpyY3cXce9IqeglPbmybTwMQAAiUbAALycfFTs1G44mXYJSY4BA",
-        ],
-        "BIOLOGY": [
-            "BQACAgQAAxkBAANsaX5Dqth2_8VnAAHWxAJdWGQfoiyxAAImGwAC8nHxUxLrGa5bxwocOAQ",
-        ],
-        "PHYSICS 1+2": [
-            "BQACAgQAAxkBAANwaX5Dsj3Xc2Ef6um7xSWT3nFduUwAAigbAALycfFT3dAcaZaAxJo4BA",
-            "BQACAgQAAxkBAANyaX5D1aR6gB30_YrTRZfk8B8piFoAAikbAALycfFTSew7BD93KTo4BA",
-        ],
-    },
+MAIN_MENU_BUTTONS = [
+    ["ENGLISH 📘"],
+    ["MATHEMATICS 📕"],
+    ["SCIENCE 📙"],
+    ["ENGINEERING 📗"],
+    ["COMPUTING 💻"],
+    ["BUSINESS 💼"],
+    ["GENERAL 📚"],
+]
 
-    "ENGINEERING 📗": {
-        "Sustainable Energy": [
-            "BQACAgQAAxkBAAN0aX5D2aFDNfKVK8mUatYEtSs4WdAAAiobAALycfFTkMQdzWQTids4BA",
-        ],
-        "Numerical Methods": [
-            "BQACAgQAAxkBAAN2aX5D3ep5Wyk1fVtxDqsUhL_zlKAAAisbAALycfFTyCNa1b5r-_Q4BA",
-        ],
-        "Statistics and Probability": [
-            "BQACAgQAAxkBAAN4aX5D8qd25WaT9RwHvHkutGjrSDUAAiwbAALycfFTRDpTGSb4Wdo4BA",
-        ],
-        "STATICS AND ENGINEERING": [
-            "BQACAgQAAxkBAAN6aX5D9qaP2WcKl8zwDG5VGW92b2kAAi0bAALycfFTMctxbY8fzKk4BA",
-        ],
-        "Power Electronics": [
-            "BQACAgQAAxkBAAN8aX5D-lfxE9Ak8u-8tYueiQ_lOHUAAi4bAALycfFT60ojbVjVR-Y4BA",
-        ],
-        "Thermodynamics": [
-            "BQACAgQAAxkBAAN-aX5EAYfNr6nG9VXUAU5QSXVFuRAAAi8bAALycfFTHZzcdQ6MfOc4BA",
-            "BQACAgQAAxkBAAOAaX5ECpTBcWN6LCSMXc44dSZzw50AAjAbAALycfFTHpWcivSKxvw4BA",
-        ],
-    },
+REQUEST_BUTTON = "طلب كتاب غير موجود 📩"
+BACK_BUTTON = "القائمة الرئيسية ⬅️"
 
-    "COMPUTING 💻": {
-        "Digital Logic": [
-            "BQACAgQAAxkBAAOCaX5EDw-ndnnCb81VUNTyk5mvkXMAAjEbAALycfFT8wg371fy31I4BA",
-        ],
-        "JAVA": [
-            "BQACAgQAAxkBAAOGaX5EHxfIL0XjswFLyaZ65bz9jw8AAjMbAALycfFTJrXTO1gNbns4BA",
-        ],
-        "C++": [
-            "BQACAgQAAxkBAAOEaX5EE1KkQtBG3q35tgarkgadHgwAAjIbAALycfFTulRfrLFL5W04BA",
-        ],
-    },
+CATEGORY_KEY_BY_BUTTON: Dict[str, str] = {
+    "ENGLISH 📘": "ENGLISH",
+    "MATHEMATICS 📕": "MATHEMATICS",
+    "SCIENCE 📙": "SCIENCE",
+    "ENGINEERING 📗": "ENGINEERING",
+    "COMPUTING 💻": "COMPUTING",
+    "BUSINESS 💼": "BUSINESS",
+    "GENERAL 📚": "GENERAL",
+}
 
-    "BUSINESS 💼": {
-        "International Economics": [
-            "BQACAgQAAxkBAAOIaX5EJxw6xSfE3ZU39QKNyAOi-JsAAjQbAALycfFT66_9SZ33KcQ4BA",
-        ],
-    },
+BOOK_MENU_BUTTONS: Dict[str, List[List[str]]] = {
+    "ENGLISH": [
+        ["IEP098"],
+        ["IEP099"],
+        ["ENL101"],
+        ["ENL102"],
+        ["ENL201"],
+        [BACK_BUTTON],
+    ],
+    "MATHEMATICS": [
+        ["IMP098"],
+        ["IMP099"],
+        ["MAT120"],
+        ["MAT202"],
+        ["MAT240"],
+        ["CALCULUS 1+2+3, 14th edition"],
+        ["CALCULUS 1+2+3, 15th edition"],
+        [BACK_BUTTON],
+    ],
+    "SCIENCE": [
+        ["CHEMISTRY"],
+        ["BIOLOGY"],
+        ["PHYSICS 1+2"],
+        [BACK_BUTTON],
+    ],
+    "ENGINEERING": [
+        ["Sustainable Energy"],
+        ["Numerical Methods"],
+        ["Statistics and Probability"],
+        ["STATICS AND ENGINEERING"],
+        ["Power Electronics"],
+        ["Thermodynamics"],
+        [BACK_BUTTON],
+    ],
+    "COMPUTING": [
+        ["Digital Logic"],
+        ["JAVA"],
+        ["C++"],
+        [BACK_BUTTON],
+    ],
+    "BUSINESS": [
+        ["International Economics"],
+        [BACK_BUTTON],
+    ],
+    "GENERAL": [
+        ["INF"],
+        ["ETHICS"],
+        [BACK_BUTTON],
+    ],
+}
 
-    "GENERAL 📚": {
-        "INF": [
-            "BQACAgQAAxkBAAOKaX5EMwndtD6s5DmqfWvdsR6JNYEAAjUbAALycfFT6tIrOpfEvIQ4BA",
-        ],
-        "ETHICS": [
-            "BQACAgQAAxkBAAOMaX5EN4xrQ1F3TrK_RpL79AZKzfgAAjYbAALycfFTRRE-1RxQLRw4BA",
-        ],
-    },
+# =========================
+# ملفّات الكتب (FILE_IDs)
+# =========================
+
+BOOK_FILES: Dict[str, List[str]] = {
+    # ---------- ENGLISH ----------
+    "IEP098": [
+        "BQACAgQAAxkBAAIL3Gl-EzrZzs2g07czYxViZnFQUmuMAAIdGwAC8nHxUxzXjXFnArCtOAQ",
+        "BQACAgQAAxkBAAIL3Wl-EzoDyNzQ5XjTE_FRGbrVuotoAAIeGwAC8nHxU3nuGyUha9KHOAQ",
+    ],
+    "IEP099": [
+        "BQACAgQAAxkBAAIMEWl-FNLQ7CV-qOpJ6NL-r412lwmHAAIhGwAC8nHxU4rMrWQVI3_Uoaq",
+        "BQACAgQAAxkBAAIMFWl-FNw65ZKvj2cUhl4nVWQn80d9AAIiGwAC8nHxU_XTBdumCrE1OAQ",
+    ],
+    "ENL101": [
+        "BQACAgQAAxkBAAIMGWl-FOUnbh4wOGsNbtLngKoYyPtuAAIjGwAC8nHxU0Y7oQvq1Z2NOAQ",
+    ],
+    "ENL102": [
+        "BQACAgQAAxkBAAIMHWl-FQXlddgKlr3P5iYirVVA9rNrAAIkGwAC8nHxU2BsDB5e1iDjOAQ",
+    ],
+    "ENL201": [
+        "BQACAgQAAxkBAAIMIWl-FQ_weESJKCt12xhL4jhS_qGWAAIlGwAC8nHxU1b2DjPqD5tVOAQ",
+    ],
+
+    # ---------- MATHEMATICS ----------
+    "IMP098": [
+        "BQACAgQAAxkBAAILz2l-ECGbiXh0jlcNWQAB4rH6wVDivgACERsAAvJx8VOGbCjs9abLrjgE",
+    ],
+    "IMP099": [
+        "BQACAgQAAxkBAAIL0Gl-ECHaJnh4p1bVl_2xEYmrvF5zAAITGwAC8nHxUws9ZXV3xq5fOAQ",
+    ],
+    "MAT120": [
+        "BQACAgQAAxkBAAIL0Wl-ECGAbAkm5fcbYxKLUQWTmAABBwACFBsAAvJx8VO5FMY6jCWnFzgE",
+    ],
+    "MAT202": [
+        "BQACAgQAAxkBAAIL0ml-ECF-irXDHPkbWBXHC8KIb-WnAAIWGwAC8nHxU58M0c9N4NY1OAQ",
+        "BQACAgQAAxkBAAIL02l-ECEG1xtclFYQE9nfddmOy-iTAAIXGwAC8nHxU5KDFOw2KgrAOAQ",
+    ],
+    "MAT240": [
+        "BQACAgQAAxkBAAIL1Gl-ECGkSQWzVoimStRO2izZYIsaAAIYGwAC8nHxU1w3q6vTihc5OAQ",
+    ],
+    "CALCULUS 1+2+3, 14th edition": [
+        "BQACAgQAAxkBAAIL1Wl-ECGdFc_Jd6jbsEF47J-lJ950AAIZGwAC8nHxU5s8Au3aPqiYOAQ",
+        "BQACAgQAAxkBAAIL1ml-ECHDd_INapp0zO-nyGOJxgltAAIbGwAC8nHxU6ngDlvpZT7LOAQ",
+    ],
+    "CALCULUS 1+2+3, 15th edition": [
+        "BQACAgQAAxkBAAIL12l-ECGz_nLCgUr0F48_s5H3D0h0AAIcGwAC8nHxU5DyCjnsOA1-OAQ",
+    ],
+
+    # ---------- SCIENCE ----------
+    "CHEMISTRY": [
+        "BQACAgQAAxkBAAIMKWl-FSTI_dUM8mdsOuzXqvtE6mjVAAInGwAC8nHxU3X8S6YnxBvtOAQ",
+    ],
+    "BIOLOGY": [
+        "BQACAgQAAxkBAAIMJWl-FRvYNe_GWcR8xfQdSERQlH8jAAImGwAC8nHxU7fqnRfcBL-JOAQ",
+    ],
+    "PHYSICS 1+2": [
+        "BQACAgQAAxkBAAIMLWl-FS4D6E8WOw4ye7VsWm-qwt6xAAIoGwAC8nHxU5UX0CLUbH48OAQ",
+        "BQACAgQAAxkBAAIMMWl-FUB--sIR3Kbp21uT4JkvZsKIAAIpGwAC8nHxU-ExZbt3dQsfOAQ",
+    ],
+
+    # ---------- ENGINEERING ----------
+    "Sustainable Energy": [
+        "BQACAgQAAxkBAAIMNml-FVAYIXNs2KPC9RyyeIYurThDAAIqGwAC8nHxU5AOCer6Uom2OAQ",
+    ],
+    "Numerical Methods": [
+        "BQACAgQAAxkBAAIMOml-FXN2tvwsnyz2Kki8Lz_4aZzmAAIrGwAC8nHxU-2B7iedfCcLOAQ",
+    ],
+    "Statistics and Probability": [
+        "BQACAgQAAxkBAAIMPml-FYWsXRClTnrowVJWTd6T1rGmAAIsGwAC8nHxU0RW_VA4ghQtOAQ",
+    ],
+    "STATICS AND ENGINEERING": [
+        "BQACAgQAAxkBAAIMQml-FZjPOxYp9ZmOOyCeaNZjQ6B0AAItGwAC8nHxUw2FATSwcdEyOAQ",
+    ],
+    "Power Electronics": [
+        "BQACAgQAAxkBAAIMRml-FaVOtMx3sENUGqGq5yVXAu9xAAIuGwAC8nHxU00l9Cv3g8z-OAQ",
+    ],
+    "Thermodynamics": [
+        "BQACAgQAAxkBAAIMSml-FbLrrmYkgzQnziGSNi9W_dgrAAIvGwAC8nHxUwpE1g0nEDKWOAQ",
+        "BQACAgQAAxkBAAIMTml-FbkUe9Fjhce70kH6fhTOV0RDAAIwGwAC8nHxU1BgiE_TMfeBOAQ",
+    ],
+
+    # ---------- COMPUTING ----------
+    "Digital Logic": [
+        "BQACAgQAAxkBAAIMUml-FcOEj8C3sprkk8wr4HUwy7dLAAIxGwAC8nHxU8K0a9dzrH-mOAQ",
+    ],
+    "JAVA": [
+        "BQACAgQAAxkBAAIMWml-FeEMdZcvxOrd_PyfhFaxmBu5AAIzGwAC8nHxU-kZyqo6BeDNOAQ",
+    ],
+    "C++": [
+        "BQACAgQAAxkBAAIMVml-FdX5yUdk6QK3xlmgmYXrlL94AAIyGwAC8nHxUxgG1qHRu715OAQ",
+    ],
+
+    # ---------- BUSINESS ----------
+    "International Economics": [
+        "BQACAgQAAxkBAAIMXml-FevL7ZdBcXOeIIy8zQlYZGozAAI0GwAC8nHxU7X3vLUkvyKcOAQ",
+    ],
+
+    # ---------- GENERAL ----------
+    "INF": [
+        "BQACAgQAAxkBAAIMYml-FfV_XIgV2ywjRO5J12Vb6NuQAAI1GwAC8nHxU8QtFQABNpq81jgE",
+    ],
+    "ETHICS": [
+        "BQACAgQAAxkBAAIMZml-Ff7ymjnq3qdBttRPIvXqLXfoAAI2GwAC8nHxU3d75xq1hwvuOAQ",
+    ],
 }
 
 
-# ============= بناء الكيبورد =============
+# =========================
+# دوال إرسال القوائم
+# =========================
 
 def main_menu_keyboard() -> ReplyKeyboardMarkup:
-    rows = [[KeyboardButton(name)] for name in CATEGORIES.keys()]
-    rows.append([KeyboardButton(REQUEST_BOOK_BUTTON)])
-    return ReplyKeyboardMarkup(rows, resize_keyboard=True)
+    return ReplyKeyboardMarkup(
+        MAIN_MENU_BUTTONS + [[REQUEST_BUTTON]],
+        resize_keyboard=True,
+    )
 
 
 def category_keyboard(category_key: str) -> ReplyKeyboardMarkup:
-    books = list(CATEGORIES[category_key].keys())
-    rows = [[KeyboardButton(title)] for title in books]
-    rows.append([KeyboardButton(BACK_BUTTON)])
-    return ReplyKeyboardMarkup(rows, resize_keyboard=True)
+    return ReplyKeyboardMarkup(
+        BOOK_MENU_BUTTONS[category_key] + [[REQUEST_BUTTON]],
+        resize_keyboard=True,
+    )
 
 
-# ============= Handlers =============
+# =========================
+# Handlers
+# =========================
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    context.user_data["state"] = "MAIN_MENU"
-    context.user_data["category"] = None
+    context.user_data.clear()
+    context.user_data["mode"] = "CATEGORY"
 
     text = (
-        "مرحباً بك في AASU BOOKS BOT 📚\n\n"
-        "بوت غير رسمي يساعد طلاب جامعة عبدالله السالم في الوصول للكتب والمراجع بصيغة PDF.\n\n"
+        "مرحبًا بك في بوت الكتب غير الرسمي لجامعة عبدالله السالم (AASU Books).\n\n"
         "طريقة الاستخدام:\n"
-        "1️⃣ اختر القسم (ENGLISH, MATHEMATICS, …) من الأزرار بالأسفل.\n"
-        "2️⃣ اختر اسم المقرر/الكتاب.\n"
-        "3️⃣ سيصلك الكتاب مباشرة.\n\n"
-        f"إذا لم تجد كتابك اضغط الزر «{REQUEST_BOOK_BUTTON}» لطلب إضافته."
+        "1️⃣ اختر القسم من الأزرار بالأسفل.\n"
+        "2️⃣ اختر اسم الكتاب المطلوب.\n"
+        "3️⃣ سيصلك الكتاب مباشرة كملف PDF.\n\n"
+        "إذا لم تجد كتابك، اضغط الزر «طلب كتاب غير موجود 📩» في الأسفل.\n"
     )
 
     await update.message.reply_text(
@@ -167,15 +257,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
 
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    text = (update.message.text or "").strip()
-    state = context.user_data.get("state", "MAIN_MENU")
-    current_category = context.user_data.get("category")
+async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if update.message is None or update.message.text is None:
+        return
 
-    # زر الرجوع
+    text = update.message.text.strip()
+
+    # زر الرجوع للقائمة الرئيسية
     if text == BACK_BUTTON:
-        context.user_data["state"] = "MAIN_MENU"
-        context.user_data["category"] = None
+        context.user_data["mode"] = "CATEGORY"
+        context.user_data.pop("category", None)
         await update.message.reply_text(
             "اختر القسم:",
             reply_markup=main_menu_keyboard(),
@@ -183,97 +274,90 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
 
     # زر طلب كتاب غير موجود
-    if text == REQUEST_BOOK_BUTTON:
+    if text == REQUEST_BUTTON:
         await update.message.reply_text(
-            "📩 طلب كتاب غير موجود\n\n"
-            "إذا لم تجد الكتاب الذي تبحث عنه، أرسل في رسالة واحدة:\n"
-            "• اسم المقرر (بالإنجليزي كما في الخطة)\n"
-            "• اسم الكتاب الكامل\n"
-            "• رقم الإصدار (Edition) إن وجد\n\n"
-            "أو تواصل مع مشرف البوت على إنستغرام:\n"
-            "@BOOKADVISORS",
-            reply_markup=main_menu_keyboard(),
+            "إذا لم تجد كتابك:\n"
+            "1️⃣ اكتب اسم المقرر + الكود (إن وُجد).\n"
+            "2️⃣ اكتب اسم الكتاب والإصدار (Edition).\n"
+            "3️⃣ أرسل الطلب في رسالة واحدة هنا أو تواصل معنا على إنستغرام:\n"
+            "@BOOKADVISORS\n\n"
+            "سنحاول إضافته في أسرع وقت ممكن.",
+            reply_markup=main_menu_keyboard()
         )
         return
 
-    # /start في أي وقت
-    if text.startswith("/start"):
-        await start(update, context)
-        return
+    mode = context.user_data.get("mode", "CATEGORY")
 
-    # اختيار قسم
-    if text in CATEGORIES:
-        context.user_data["state"] = "CATEGORY"
-        context.user_data["category"] = text
+    # اختيار قسم من القائمة الرئيسية
+    if text in CATEGORY_KEY_BY_BUTTON:
+        category_key = CATEGORY_KEY_BY_BUTTON[text]
+        context.user_data["mode"] = "BOOK"
+        context.user_data["category"] = category_key
+
         await update.message.reply_text(
-            f"اختر الكتاب من قسم:\n{text}",
-            reply_markup=category_keyboard(text),
+            "اختر الكتاب من القسم:",
+            reply_markup=category_keyboard(category_key),
         )
         return
 
-    # حالة داخل قسم: اختيار كتاب
-    if state == "CATEGORY" and current_category in CATEGORIES:
-        books = CATEGORIES[current_category]
+    # اختيار كتاب من داخل قسم
+    if mode == "BOOK":
+        category_key = context.user_data.get("category")
 
-        if text in books:
-            file_ids = books[text]
+        if category_key and text in BOOK_FILES:
+            await update.message.reply_text(f"📚 جاري إرسال: {text}")
 
-            await update.message.reply_text(f"جاري إرسال: {text} 📚")
-
-            for fid in file_ids:
+            files = BOOK_FILES[text]
+            for file_id in files:
                 try:
-                    await update.message.bot.send_document(
+                    # هنا كان الخطأ: يجب استخدام context.bot وليس update.message.bot
+                    await context.bot.send_document(
                         chat_id=update.effective_chat.id,
-                        document=fid,
+                        document=file_id,
+                        caption=text,
                     )
                 except Exception as e:
-                    error_text = str(e)
-                    print(f"Error sending {text} with file_id {fid}: {error_text}")
-
+                    logger.error("Telegram error while sending %s: %s", text, e)
                     await update.message.reply_text(
                         "حدث خطأ أثناء إرسال الملف.\n"
                         "رسالة النظام من تيليجرام:\n"
-                        f"{error_text}\n\n"
-                        "إذا تكرر الخطأ، راسلنا على إنستغرام: @BOOKADVISORS",
-                        reply_markup=category_keyboard(current_category),
+                        f"{e}\n\n"
+                        "إذا تكرر الخطأ، راسلنا على إنستغرام:\n"
+                        "@BOOKADVISORS"
                     )
-                    return
+                    break
+            return
 
-            await update.message.reply_text(
-                "يمكنك اختيار كتاب آخر من نفس القسم، أو الضغط على "
-                f"«{BACK_BUTTON}» للعودة للقائمة الرئيسية.",
-                reply_markup=category_keyboard(current_category),
-            )
-        else:
-            await update.message.reply_text(
-                "من فضلك اختر اسم الكتاب من الأزرار، "
-                f"أو اضغط «{BACK_BUTTON}» للعودة.",
-                reply_markup=category_keyboard(current_category),
-            )
-        return
-
-    # أي نص غير معروف
-    context.user_data["state"] = "MAIN_MENU"
-    context.user_data["category"] = None
+    # أي شيء آخر
     await update.message.reply_text(
-        "اختر القسم من الأزرار في الأسفل، أو اكتب /start للعودة للبداية.",
+        "استخدم الأزرار في الأسفل لاختيار القسم أو الكتاب.\n"
+        "للعودة اضغط «القائمة الرئيسية ⬅️».",
         reply_markup=main_menu_keyboard(),
     )
 
 
-# ============= تشغيل البوت =============
+async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    logger.error("Exception while handling an update: %s", context.error)
+
+
+# =========================
+# main()
+# =========================
 
 def main() -> None:
-    bot_token = os.getenv("BOT_TOKEN")
-    if not bot_token:
-        raise RuntimeError("Environment variable BOT_TOKEN is not set")
+    if not BOT_TOKEN:
+        raise RuntimeError("متغيّر البيئة BOT_TOKEN غير موجود.")
 
-    app = ApplicationBuilder().token(bot_token).build()
+    application = Application.builder().token(BOT_TOKEN).build()
 
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(
+        MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text)
+    )
 
-    app.run_polling()
+    application.add_error_handler(error_handler)
+
+    application.run_polling()
 
 
 if __name__ == "__main__":
