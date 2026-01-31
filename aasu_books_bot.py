@@ -67,7 +67,7 @@ CATEGORIES = {
 
     "SCIENCE 📙": {
         "CHEMISTRY": [
-            # ملاحظة: هذا نفس ID حق ENL201 كما أرسلته أنت. لو كان خطأ، استخرج واحد جديد لـ Chemistry واستبدله هنا.
+            # تنبيه: هذا FILE_ID مطابق لـ ENL201 كما أرسلته أنت. لو كان خطأ استبدله لاحقاً بالصح.
             "BQACAgQAAxkBAANqaX5DpyY3cXce9IqeglPbmybTwMQAAiUbAALycfFTs1G44mXYJSY4BA",
         ],
         "BIOLOGY": [
@@ -201,7 +201,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await start(update, context)
         return
 
-    # اختيار قسم في أي حالة
+    # اختيار قسم
     if text in CATEGORIES:
         context.user_data["state"] = "CATEGORY"
         context.user_data["category"] = text
@@ -211,7 +211,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         )
         return
 
-    # داخل قسم: اختيار كتاب
+    # حالة داخل قسم: اختيار كتاب
     if state == "CATEGORY" and current_category in CATEGORIES:
         books = CATEGORIES[current_category]
 
@@ -227,10 +227,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                         document=fid,
                     )
                 except Exception as e:
-                    # لو حصل خطأ من تليجرام
-                    print(f"Error sending {text} with file_id {fid}: {e}")
+                    error_text = str(e)
+                    print(f"Error sending {text} with file_id {fid}: {error_text}")
+
                     await update.message.reply_text(
                         "حدث خطأ أثناء إرسال الملف.\n"
+                        "رسالة النظام من تيليجرام:\n"
+                        f"{error_text}\n\n"
                         "إذا تكرر الخطأ، راسلنا على إنستغرام: @BOOKADVISORS",
                         reply_markup=category_keyboard(current_category),
                     )
@@ -242,7 +245,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 reply_markup=category_keyboard(current_category),
             )
         else:
-            # ضغط شيء غير موجود في هذا القسم
             await update.message.reply_text(
                 "من فضلك اختر اسم الكتاب من الأزرار، "
                 f"أو اضغط «{BACK_BUTTON}» للعودة.",
