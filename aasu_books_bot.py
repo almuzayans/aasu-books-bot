@@ -4,8 +4,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandle
 
 # ضع توكن البوت الذي أخذته من BotFather هنا:
 import os
-TOKEN = "8164546310:AAEsgA6VWm1Z83w0qU8XJ-ol2Bcs-ufhhHg"
-
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 BOOKS = {
     "english": {
@@ -296,4 +295,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
