@@ -42,10 +42,10 @@ BOOKS: Dict[str, Dict[str, Any]] = {
             },
             "IEP099": {
                 "title": "IEP099",
-                # ضع هنا file_id الصحيح لملفات IEP099 عندما تحصل عليهما
-                # مثال:
-                # "files": ["id_1", "id_2"],
-                "files": [],
+                "files": [
+                    "BQACAgQAAxkBAAIL3Gl-EzrZzs2g07czYxViZnFQUmuMAAIdGwAC8nHxUxzXjXFnArCtOAQ",
+                    "BQACAgQAAxkBAAIL3Wl-EzoDyNzQ5XjTE_FRGbrVuotoAAIeGwAC8nHxU3nuGyUha9KHOAQ",
+                ],
             },
             "ENL101": {
                 "title": "ENL101",
@@ -418,3 +418,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
