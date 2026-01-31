@@ -1,4 +1,3 @@
-# aasu_books_bot.py
 import os
 import logging
 from typing import Dict, List, Union
@@ -6,6 +5,7 @@ from typing import Dict, List, Union
 from telegram import (
     Update,
     ReplyKeyboardMarkup,
+    KeyboardButton,
     InlineKeyboardMarkup,
     InlineKeyboardButton,
 )
@@ -18,7 +18,9 @@ from telegram.ext import (
     filters,
 )
 
-# ----------------- الإعدادات العامة -----------------
+# ==========================
+# إعدادات عامة
+# ==========================
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -30,10 +32,12 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 if not BOT_TOKEN:
     raise RuntimeError("Environment variable BOT_TOKEN is not set")
 
-# ----------------- بيانات الكتب -----------------
+REQUEST_BOOK_BUTTON = "📩 طلب كتاب غير موجود"
 
-# النوع: Dict[category_key, Dict[book_name, Union[str, List[str]]]]
-# إذا كان الكتاب في ملفين، ضع list من file_id
+# ==========================
+# بيانات الكتب
+# ==========================
+
 BOOKS: Dict[str, Dict[str, Union[str, List[str]]]] = {
     "ENGLISH": {
         "IEP098": [
@@ -96,7 +100,7 @@ BOOKS: Dict[str, Dict[str, Union[str, List[str]]]] = {
     },
 }
 
-# أزرار القائمة الرئيسية: (النص الظاهر, المفتاح في BOOKS)
+# نص الزر في القائمة الرئيسية مقابل المفتاح في BOOKS
 CATEGORIES = [
     ("ENGLISH 📘", "ENGLISH"),
     ("MATHEMATICS 📕", "MATHEMATICS"),
@@ -108,11 +112,13 @@ CATEGORIES = [
 ]
 
 
-# ----------------- لوحات الأزرار -----------------
-
+# ==========================
+# لوحات الأزرار
+# ==========================
 
 def main_menu_keyboard() -> ReplyKeyboardMarkup:
-    rows = [[text] for text, _ in CATEGORIES]
+    rows = [[KeyboardButton(text)] for text, _ in CATEGORIES]
+    rows.append([KeyboardButton(REQUEST_BOOK_BUTTON)])
     return ReplyKeyboardMarkup(rows, resize_keyboard=True)
 
 
@@ -121,31 +127,21 @@ def category_keyboard(category_key: str) -> InlineKeyboardMarkup:
     buttons: List[List[InlineKeyboardButton]] = []
 
     for book_name in books.keys():
-        # callback_data = "CATEGORY|BOOK_NAME"
         data = f"{category_key}|{book_name}"
         buttons.append([InlineKeyboardButton(book_name, callback_data=data)])
-
-    # زر دعم إنستغرام في أخر القائمة
-    buttons.append(
-        [
-            InlineKeyboardButton(
-                "هذا الكتاب غير موجود؟ راسلنا على @BOOKADVISORS",
-                url="https://www.instagram.com/BOOKADVISORS",
-            )
-        ]
-    )
 
     return InlineKeyboardMarkup(buttons)
 
 
-# ----------------- الهاندلرز -----------------
-
+# ==========================
+# Handlers
+# ==========================
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     text = (
-        "مرحبًا بك في AASU Books Bot 📚\n\n"
-        "اختر القسم من القائمة السفلية، ثم اختر المقرر ليصلك الكتاب بصيغة PDF مباشرة.\n\n"
-        "إذا لم تجد كتابك، يمكنك دائمًا مراسلتنا على إنستغرام:\n"
+        "مرحباً بك في AASU Books Bot 📚\n\n"
+        "اختر القسم من الأزرار أسفل الشاشة، ثم اختر اسم المقرر ليصلك الكتاب بصيغة PDF.\n\n"
+        "إذا لم تجد كتابك يمكنك مراسلتنا على إنستغرام:\n"
         "@BOOKADVISORS"
     )
     await update.message.reply_text(text, reply_markup=main_menu_keyboard())
@@ -153,28 +149,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     text = (
-        "طريقة استخدام البوت:\n"
+        "طريقة الاستخدام:\n"
         "1️⃣ من القائمة السفلية اختر القسم (ENGLISH, MATHEMATICS …).\n"
-        "2️⃣ ستظهر لك قائمة بالمواد داخل هذا القسم.\n"
-        "3️⃣ اضغط على اسم المادة ليصلك الكتاب PDF.\n\n"
-        "إن لم تجد الكتاب المطلوب، راسلنا على إنستغرام: @BOOKADVISORS"
+        "2️⃣ ستظهر لك قائمة بالمواد.\n"
+        "3️⃣ اضغط على اسم المقرر ليصلك الكتاب.\n\n"
+        "إذا لم تجد كتابك: استخدم زر «📩 طلب كتاب غير موجود» أو راسلنا:\n"
+        "@BOOKADVISORS"
     )
     await update.message.reply_text(text, reply_markup=main_menu_keyboard())
-
-
-async def send_category(update: Update, category_key: str) -> None:
-    books = BOOKS.get(category_key)
-    if not books:
-        await update.message.reply_text(
-            "لا توجد كتب مسجّلة لهذا القسم حاليًا.",
-            reply_markup=main_menu_keyboard(),
-        )
-        return
-
-    await update.message.reply_text(
-        "اختر المقرر المطلوب:",
-        reply_markup=category_keyboard(category_key),
-    )
 
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -183,13 +165,37 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
     text = (update.message.text or "").strip()
 
-    # 1) إذا ضغط زر من القائمة الرئيسية
+    # زر طلب كتاب غير موجود
+    if text == REQUEST_BOOK_BUTTON:
+        await update.message.reply_text(
+            "📩 طلب كتاب غير موجود\n\n"
+            "أرسل في رسالة واحدة:\n"
+            "• اسم المقرر (بالإنجليزي كما في الخطة)\n"
+            "• اسم الكتاب الكامل\n"
+            "• رقم الإصدار (Edition) إن وجد\n\n"
+            "أو راسلنا مباشرة على إنستغرام:\n"
+            "@BOOKADVISORS"
+        )
+        return
+
+    # اختيار قسم من القائمة الرئيسية
     for button_text, category_key in CATEGORIES:
         if text == button_text:
-            await send_category(update, category_key)
+            books = BOOKS.get(category_key, {})
+            if not books:
+                await update.message.reply_text(
+                    "لا توجد كتب مسجلة لهذا القسم حالياً.",
+                    reply_markup=main_menu_keyboard(),
+                )
+                return
+
+            await update.message.reply_text(
+                f"اختر المقرر من قسم {category_key}:",
+                reply_markup=category_keyboard(category_key),
+            )
             return
 
-    # 2) أي شيء آخر = مساعدة
+    # أي نص آخر → مساعدة
     await help_command(update, context)
 
 
@@ -204,46 +210,60 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     if "|" not in data:
         return
 
-    category_key, book_name = data.split("|", 1)
+    try:
+        category_key, book_name = data.split("|", 1)
+    except ValueError:
+        return
+
     books = BOOKS.get(category_key, {})
     file_value = books.get(book_name)
 
     if not file_value:
         await query.message.reply_text(
-            "لم يتم العثور على هذا الملف.\n"
-            "إن لم يكن الكتاب متوفرًا، راسلنا على إنستغرام: @BOOKADVISORS"
+            "لم يتم العثور على هذا الكتاب.\n"
+            "إذا كان مفقوداً، يمكنك مراسلتنا على إنستغرام: @BOOKADVISORS"
         )
         return
 
-    chat_id = query.message.chat.id  # مهم: chat.id في الإصدارات الحديثة
+    chat_id = update.effective_chat.id  # أكثر أماناً من message.chat_id
 
-    # كتاب واحد أو أكثر من ملف
-    if isinstance(file_value, list):
-        for idx, fid in enumerate(file_value, start=1):
-            caption = f"{book_name} (جزء {idx})" if len(file_value) > 1 else book_name
+    # تأكيد للمستخدم أنه سيتم الإرسال
+    await query.message.reply_text(f"جاري إرسال: {book_name} 📚")
+
+    try:
+        if isinstance(file_value, list):
+            for idx, fid in enumerate(file_value, start=1):
+                caption = f"{book_name} (Part {idx})" if len(file_value) > 1 else book_name
+                await context.bot.send_document(
+                    chat_id=chat_id,
+                    document=fid,
+                    caption=caption,
+                )
+        else:
             await context.bot.send_document(
                 chat_id=chat_id,
-                document=fid,
-                caption=caption,
+                document=file_value,
+                caption=book_name,
             )
-    else:
-        await context.bot.send_document(
-            chat_id=chat_id,
-            document=file_value,
-            caption=book_name,
+    except Exception as e:
+        logger.exception("Error sending document")
+        await query.message.reply_text(
+            "حدث خطأ أثناء إرسال الملف.\n"
+            "إذا تكرر الخطأ، راسلنا على إنستغرام: @BOOKADVISORS"
         )
 
 
-# ----------------- نقطة التشغيل -----------------
-
+# ==========================
+# Main
+# ==========================
 
 def main() -> None:
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(CallbackQueryHandler(handle_callback))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+    app.add_handler(CallbackQueryHandler(handle_callback))
 
     logger.info("AASU Books Bot is running...")
     app.run_polling()
