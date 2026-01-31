@@ -27,6 +27,11 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 if not BOT_TOKEN:
     raise RuntimeError("Environment variable BOT_TOKEN is not set")
 
+# =========================
+# ADMIN USER ID
+# =========================
+ADMIN_ID = 946972632  # اليوزر آي دي الخاص بك
+
 
 # =========================
 # بيانات الكتب (كل الأقسام)
@@ -291,7 +296,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             "• اسم المقرر\n"
             "• اسم الكتاب\n"
             "• رقم الطبعة (Edition) إن وجد\n\n"
-            " على قناتنا في تليقرام:\n"
+            "على قناتنا في تليقرام:\n"
             "@universitiesbooks",
             reply_markup=main_menu(),
         )
@@ -334,7 +339,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
                 logger.error("Error sending %s: %s", book_title, e)
                 await update.message.reply_text(
                     "حدث خطأ أثناء إرسال الملف.\n"
-                    "إذا تكرر الخطأ، راسلنا على قناتنا في تلقرام:\n"
+                    "إذا تكرر الخطأ، راسلنا على قناتنا في تليقرام:\n"
                     "@universitiesbooks",
                     reply_markup=section_menu(sec_key),
                 )
@@ -350,6 +355,33 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
 
 # =========================
+# ADMIN: استخراج file_id لأي ملف
+# =========================
+
+async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """عندما يرسل الأدمن ملفًا للبوت يرجع له الـ file_id."""
+    user_id = update.effective_user.id if update.effective_user else None
+    if user_id != ADMIN_ID:
+        # أي مستخدم عادي يرسل ملف → نتجاهله (لا نرد)
+        return
+
+    doc = update.message.document
+    if not doc:
+        return
+
+    file_id = doc.file_id
+    file_name = doc.file_name or "بدون اسم"
+
+    logger.info("ADMIN %s sent document: %s (%s)", user_id, file_name, file_id)
+
+    await update.message.reply_text(
+        f"👑 ADMIN MODE\n"
+        f"File name: {file_name}\n\n"
+        f"file_id:\n{file_id}"
+    )
+
+
+# =========================
 # main
 # =========================
 
@@ -358,6 +390,8 @@ def main() -> None:
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+    # هاندلر الملفات (Document) للأدمن
+    app.add_handler(MessageHandler(filters.Document.ALL, handle_document))
 
     logger.info("Bot started…")
     app.run_polling()
@@ -365,9 +399,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
